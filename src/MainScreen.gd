@@ -33,6 +33,7 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 				child.queue_free()
 		var profile = profile_scene.instance()
 		profile.data = json
+		profile.instance_address = instance_address
 		profile_tab.add_child(profile)
 		return
 	return

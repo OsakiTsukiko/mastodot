@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://src/Screens/Profile.gd" type="Script" id=1]
 [ext_resource path="res://src/Screens/Profile/Avatar.gd" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.182487, 0.182487, 0.232422, 1 )
 
 [node name="Profile" type="MarginContainer"]
 anchor_right = 1.0
@@ -19,10 +22,11 @@ margin_left = 5.0
 margin_top = 5.0
 margin_right = 1019.0
 margin_bottom = 595.0
+custom_constants/separation = 10
 
 [node name="Banner" type="TextureRect" parent="VBoxContainer"]
 margin_right = 1014.0
-margin_bottom = 293.0
+margin_bottom = 290.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 expand = true
@@ -40,16 +44,117 @@ custom_constants/margin_bottom = 15
 margin_left = 15.0
 margin_top = 15.0
 margin_right = 15.0
-margin_bottom = 278.0
+margin_bottom = 275.0
 expand = true
 stretch_mode = 7
 script = ExtResource( 2 )
 
 [node name="Panel" type="Panel" parent="VBoxContainer"]
-margin_top = 297.0
+margin_top = 300.0
 margin_right = 1014.0
 margin_bottom = 590.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Panel/MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1004.0
+margin_bottom = 280.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer"]
+margin_right = 994.0
+margin_bottom = 270.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+margin_right = 994.0
+margin_bottom = 14.0
+
+[node name="DisplayName" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_right = 613.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+size_flags_stretch_ratio = 5.0
+valign = 1
+
+[node name="PostsCount" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 617.0
+margin_right = 740.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+align = 2
+valign = 1
+
+[node name="FollowersCount" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 744.0
+margin_right = 867.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+align = 2
+valign = 1
+
+[node name="FollowingCount" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 871.0
+margin_right = 994.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+align = 2
+valign = 1
+
+[node name="Padding_01" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+margin_top = 18.0
+margin_right = 994.0
+margin_bottom = 32.0
+
+[node name="Padding_02" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+margin_top = 36.0
+margin_right = 994.0
+margin_bottom = 50.0
+custom_styles/normal = SubResource( 1 )
+
+[node name="Padding_03" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+margin_top = 54.0
+margin_right = 994.0
+margin_bottom = 68.0
+
+[node name="Note" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 994.0
+margin_bottom = 86.0
+
+[node name="Padding_04" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 994.0
+margin_bottom = 104.0
+
+[node name="Padding_05" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 994.0
+margin_bottom = 104.0
+custom_styles/normal = SubResource( 1 )
+
+[node name="Padding_06" type="Label" parent="VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 994.0
+margin_bottom = 104.0
 
 [connection signal="request_completed" from="HTTPRequest" to="." method="_on_main_http_request_completed"]
