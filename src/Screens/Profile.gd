@@ -79,3 +79,8 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 		texture.create_from_image(image)
 		avatar.texture = texture
 		return
+
+
+func _on_LogOut_pressed():
+	Utils.f_remove("token")
+	get_tree().reload_current_scene()

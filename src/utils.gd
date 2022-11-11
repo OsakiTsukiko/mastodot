@@ -13,3 +13,7 @@ static func f_read(filename):
 	var content = file.get_as_text()
 	file.close()
 	return content
+
+static func f_remove(filename):
+	var dir = Directory.new()
+	dir.remove("user://" + filename + ".dat")
