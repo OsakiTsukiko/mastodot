@@ -29,7 +29,12 @@ func make_http_req(id: String, url: String, headers: Array, secure, method, req_
 	)
 
 func _ready():
-	display_name.text = data.display_name + "\n@" + data.username + "@" + instance_address.replace("https://", "").replace("/", "")
+	var uname 
+	if (data.has('display_name')): 
+		uname = data.display_name 
+	else: 
+		uname = data.username
+	display_name.text = uname + "\n@" + data.username + "@" + instance_address.replace("https://", "").replace("/", "")
 	posts_count.text = String(data.statuses_count) + " Posts"
 	followers_count.text = String(data.followers_count) + " Followers"
 	following_count.text = String(data.following_count) + " Following  "

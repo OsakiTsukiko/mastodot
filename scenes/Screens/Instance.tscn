@@ -112,6 +112,7 @@ margin_right = 333.0
 margin_bottom = 203.0
 text = "TITLE"
 align = 1
+autowrap = true
 
 [node name="URL" type="Label" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer"]
 margin_top = 207.0
@@ -120,6 +121,7 @@ margin_bottom = 221.0
 custom_colors/font_color = Color( 0.701961, 0.701961, 0.701961, 1 )
 text = "URL"
 align = 1
+autowrap = true
 
 [node name="Padding_02" type="MarginContainer" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer"]
 margin_top = 225.0
@@ -196,6 +198,7 @@ size_flags_vertical = 7
 custom_styles/normal = ExtResource( 4 )
 align = 1
 valign = 1
+autowrap = true
 
 [node name="StatusCount" type="Label" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer/HBoxContainerValues"]
 margin_left = 111.0
@@ -206,6 +209,7 @@ size_flags_vertical = 7
 custom_styles/normal = ExtResource( 4 )
 align = 1
 valign = 1
+autowrap = true
 
 [node name="DomainCount" type="Label" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer/HBoxContainerValues"]
 margin_left = 222.0
@@ -216,6 +220,7 @@ size_flags_vertical = 7
 custom_styles/normal = ExtResource( 4 )
 align = 1
 valign = 1
+autowrap = true
 
 [node name="Email" type="Label" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer"]
 margin_top = 348.0
@@ -223,6 +228,7 @@ margin_right = 333.0
 margin_bottom = 362.0
 align = 1
 valign = 1
+autowrap = true
 
 [node name="Owner" type="Label" parent="HBoxContainer/Thumbnail/ScrollContainer/VBoxContainer"]
 margin_top = 366.0
@@ -231,3 +237,4 @@ margin_bottom = 380.0
 custom_styles/normal = ExtResource( 4 )
 align = 1
 valign = 1
+autowrap = true
