@@ -70,6 +70,7 @@ Rules
 "
 align = 1
 valign = 1
+autowrap = true
 
 [node name="Thumbnail" type="Panel" parent="HBoxContainer"]
 margin_left = 681.0

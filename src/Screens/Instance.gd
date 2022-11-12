@@ -68,6 +68,7 @@ func _ready():
 	var t = false
 	for rule in data.rules:
 		var rule_text = Label.new()
+		rule_text.autowrap = true
 		if (t):
 			var style: StyleBoxFlat = style_01
 			rule_text.add_stylebox_override("normal", load("res://scenes/Screens/Instance/style_01.tres"))
