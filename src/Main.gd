@@ -64,6 +64,7 @@ func handle_auth_code(value: String):
 	load_loading_screen()
 	client_info["auth_code"] = value
 	current_main_http_req = "get_access_token"
+	
 	var req_body := {
 		"client_id": client_info["client_id"],
 		"client_secret": client_info["client_secret"],
@@ -72,6 +73,7 @@ func handle_auth_code(value: String):
 		"code": value,
 		"scope": "read write follow push"
 	}
+	
 	main_http.request(
 		instance_address + "oauth/token", 
 		["Content-Type: application/json"], 

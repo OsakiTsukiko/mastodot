@@ -17,6 +17,7 @@ var instance_address: String
 
 func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary):
 	var http_req_node: HTTPRequest = HTTPRequest.new()
+	http_req_node.use_threads = true
 	networking.add_child(http_req_node)
 	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id])
 	http_req_node.request(
@@ -51,6 +52,7 @@ func _ready():
 		HTTPClient.METHOD_GET,
 		{}
 	)
+	
 	make_http_req(
 		"avatar",
 		data.avatar_static,
@@ -59,6 +61,7 @@ func _ready():
 		HTTPClient.METHOD_GET,
 		{}
 	)
+	
 	return
 
 func http_req_handler(result, response_code, headers, body, req_node, id):
@@ -66,11 +69,11 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 	if (id == "banner"):
 		var image = Image.new()
 		var image_error 
-		if ("png" in data.header_static):
+		if (data.header_static.get_extension() == "png"):
 			image_error = image.load_png_from_buffer(body)
-		elif ("jpg" in data.header_static):
+		elif (data.header_static.get_extension() == "jpg"):
 			image_error = image.load_jpg_from_buffer(body)
-		elif ("webp" in data.header_static):
+		elif (data.header_static.get_extension() == "webp"):
 			image_error = image.load_webp_from_buffer(body)
 		else:
 			return

@@ -24,6 +24,10 @@ config/name="Mastodot"
 run/main_scene="res://scenes/Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Config="*res://src/Config.gd"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
