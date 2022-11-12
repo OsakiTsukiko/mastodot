@@ -2,7 +2,8 @@ extends MarginContainer
 
 const field_scene = preload("res://scenes/Screens/Profile/Field.tscn")
 
-onready var main_http = $HTTPRequest
+onready var networking = $Networking
+
 onready var banner = $VBoxContainer/Banner
 onready var avatar = $VBoxContainer/Banner/MarginContainer/Avatar
 onready var display_name = $VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer/DisplayName
@@ -11,9 +12,20 @@ onready var following_count = $VBoxContainer/Panel/MarginContainer/ScrollContain
 onready var posts_count = $VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainer/PostsCount
 onready var note = $VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer/Note
 
-var current_main_http_req: String
 var data: Dictionary
 var instance_address: String
+
+func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary):
+	var http_req_node: HTTPRequest = HTTPRequest.new()
+	networking.add_child(http_req_node)
+	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id])
+	http_req_node.request(
+		url, 
+		headers, 
+		secure, 
+		method, 
+		to_json(req_body)
+	)
 
 func _ready():
 	display_name.text = data.display_name + "\n@" + data.username + "@" + instance_address.replace("https://", "").replace("/", "")
@@ -31,14 +43,27 @@ func _ready():
 			field_instance.value = field_data.value + "  "
 			$VBoxContainer/Panel/MarginContainer/ScrollContainer/VBoxContainer.add_child(field_instance)
 	
-	current_main_http_req = "banner"
-	main_http.request(data.header_static)
+	make_http_req(
+		"banner",
+		data.header_static,
+		[],
+		true,
+		HTTPClient.METHOD_GET,
+		{}
+	)
+	make_http_req(
+		"avatar",
+		data.avatar_static,
+		[],
+		true,
+		HTTPClient.METHOD_GET,
+		{}
+	)
 	return
 
-
-func _on_main_http_request_completed(result, response_code, headers, body):
-	
-	if ( current_main_http_req == "banner" ):
+func http_req_handler(result, response_code, headers, body, req_node, id):
+	req_node.queue_free()
+	if (id == "banner"):
 		var image = Image.new()
 		var image_error 
 		if ("png" in data.header_static):
@@ -56,11 +81,9 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 		var texture = ImageTexture.new()
 		texture.create_from_image(image)
 		banner.texture = texture
-		current_main_http_req = "avatar"
-		main_http.request(data.avatar_static)
 		return
 	
-	if ( current_main_http_req == "avatar" ):
+	if (id == "avatar"):
 		var image = Image.new()
 		var image_error 
 		if ("png" in data.avatar_static):
@@ -79,7 +102,6 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 		texture.create_from_image(image)
 		avatar.texture = texture
 		return
-
 
 func _on_LogOut_pressed():
 	Utils.f_remove("token")

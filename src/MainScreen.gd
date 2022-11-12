@@ -3,29 +3,45 @@ extends MarginContainer
 const profile_scene = preload("res://scenes/Screens/Profile.tscn")
 const loading_scene = preload("res://scenes/Loading.tscn")
 
-onready var main_http = $HTTPRequest
+onready var networking = $Networking
+
 onready var profile_tab = $TabContainer/Profile
 
-var current_main_http_req: String
 var access_token: String
 var instance_address: String
 
+func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary):
+	var http_req_node: HTTPRequest = HTTPRequest.new()
+	networking.add_child(http_req_node)
+	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id])
+	http_req_node.request(
+		url, 
+		headers, 
+		secure, 
+		method, 
+		to_json(req_body)
+	)
+
 func _ready():
+	make_http_req("guagle", "https://google.com", [], true, HTTPClient.METHOD_GET, {})
+	
 	var loading = loading_scene.instance()
 	loading.add_to_group("loading")
 	profile_tab.add_child(loading)
 	
-	current_main_http_req = "verify_credentials"
-	main_http.request(
-		instance_address + "api/v1/accounts/verify_credentials", 
+	make_http_req(
+		"verify_credentials",
+		instance_address + "api/v1/accounts/verify_credentials",
 		["Authorization: Bearer " + access_token],
 		true,
-		HTTPClient.METHOD_GET
+		HTTPClient.METHOD_GET,
+		{}
 	)
 	return
 
-func _on_main_http_request_completed(result, response_code, headers, body):
-	if (current_main_http_req == "verify_credentials"):
+func http_req_handler(result, response_code, headers, body, req_node, id):
+	req_node.queue_free()
+	if (id == "verify_credentials"):
 		var json = parse_json(body.get_string_from_utf8())
 		Utils.f_write("user_debug", body.get_string_from_utf8())
 		for child in profile_tab.get_children():
@@ -36,4 +52,3 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 		profile.instance_address = instance_address
 		profile_tab.add_child(profile)
 		return
-	return
