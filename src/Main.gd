@@ -6,10 +6,9 @@ const auth_code_scene = preload("res://scenes/Login/AuthCode.tscn")
 const loading_scene = preload("res://scenes/Loading.tscn")
 const main_screen_scene = preload("res://scenes/MainScreen.tscn")
 
+onready var networking = $Networking
 onready var scene_cont = $Panel/SceneCont
-onready var main_http = $HTTPRequest
 
-var current_main_http_req: String
 var instance_address: String
 var access_token: String
 var client_info: Dictionary = {
@@ -17,6 +16,19 @@ var client_info: Dictionary = {
 	"client_id": "",
 	"client_secret": ""
 }
+
+func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary):
+	var http_req_node: HTTPRequest = HTTPRequest.new()
+	http_req_node.use_threads = true
+	networking.add_child(http_req_node)
+	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id])
+	http_req_node.request(
+		url, 
+		headers, 
+		secure, 
+		method, 
+		to_json(req_body)
+	)
 
 func load_loading_screen():
 	var loading_screen = loading_scene.instance()
@@ -57,13 +69,18 @@ func handle_instance_selector(value: String):
 	instance_address = "https://" + value + "/"
 	Utils.f_write("instance_address", instance_address)
 	
-	current_main_http_req = "check_if_instance_exists"
-	main_http.request(instance_address + "api/v1/timelines/public?limit=1")
+	make_http_req(
+		"check_if_instance_exists",
+		instance_address + "api/v1/timelines/public?limit=1",
+		[],
+		true,
+		HTTPClient.METHOD_GET,
+		{}
+	)
 
 func handle_auth_code(value: String):
 	load_loading_screen()
 	client_info["auth_code"] = value
-	current_main_http_req = "get_access_token"
 	
 	var req_body := {
 		"client_id": client_info["client_id"],
@@ -73,37 +90,36 @@ func handle_auth_code(value: String):
 		"code": value,
 		"scope": "read write follow push"
 	}
-	
-	main_http.request(
-		instance_address + "oauth/token", 
-		["Content-Type: application/json"], 
-		true, 
-		HTTPClient.METHOD_POST, 
-		to_json(req_body)
+
+	make_http_req(
+		"get_access_token",
+		instance_address + "oauth/token",
+		["Content-Type: application/json"],
+		true,
+		HTTPClient.METHOD_POST,
+		req_body
 	)
 
-# SIGNALS
-func _on_main_http_request_completed(result, response_code, headers, body):
-	print("Incoming Request Results")
-	
-	if (current_main_http_req == "check_if_instance_exists"):
+func http_req_handler(result, response_code, headers, body, req_node, id):
+	req_node.queue_free()
+	if (id == "check_if_instance_exists"):
 		var json = JSON.parse(body.get_string_from_utf8())
 		if (response_code == 200):
-			current_main_http_req = "create_application"
 			var req_body := {
 				"client_name": "mastodot",
 				"redirect_uris": "urn:ietf:wg:oauth:2.0:oob",
 				"scopes": "read write follow push",
 				"website": "https://osakitsukiko.github.io"
 			}
-			main_http.request(
-				instance_address + "api/v1/apps", 
-				["Content-Type: application/json"], 
-				true, 
-				HTTPClient.METHOD_POST, 
-				to_json(req_body)
+			
+			make_http_req(
+				"create_application",
+				instance_address + "api/v1/apps",
+				["Content-Type: application/json"],
+				true,
+				HTTPClient.METHOD_POST,
+				req_body
 			)
-			return
 		elif (response_code == 0):
 			free_loading_screen()
 			instance_address = ""
@@ -117,10 +133,10 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 		else:
 			free_loading_screen()
 			instance_address = ""
-			init_instance_selector("Error: (HTTP Code) " + response_code)
+			init_instance_selector("Error: (HTTP Code) " + String(response_code))
 			return
 	
-	if (current_main_http_req == "create_application"):
+	if (id == "create_application"):
 		var json = parse_json(body.get_string_from_utf8())
 		if ( response_code == 200 ):
 			client_info["client_id"] = json.client_id
@@ -135,13 +151,11 @@ func _on_main_http_request_completed(result, response_code, headers, body):
 			auth_code.error_text = "* url copied to clipboard"
 			scene_cont.add_child(auth_code)
 		return
-	
-	if (current_main_http_req == "get_access_token"):
+		
+	if (id == "get_access_token"):
 		var json = parse_json(body.get_string_from_utf8())
 		access_token = json.access_token
 		Utils.f_write("token", access_token)
 		free_loading_screen()
 		load_main_screen()
 		return
-	
-	return
