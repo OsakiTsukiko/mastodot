@@ -26,6 +26,15 @@ func make_http_req(id: String, url: String, headers: Array, secure, method, req_
 		to_json(req_body)
 	)
 
+func log_out():
+	var users = Utils.f_read("users")
+	users = parse_json(users)
+	for user in users:
+		if (user.token == access_token):
+			users.erase(user)
+			Utils.f_write("users", to_json(users))
+	get_tree().reload_current_scene()
+
 func _ready():
 	var loading = loading_scene.instance()
 	loading.add_to_group("loading")

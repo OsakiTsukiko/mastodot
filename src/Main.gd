@@ -2,6 +2,7 @@ extends Control
 
 const instance_selector_scene = preload("res://scenes/Login/InstanceSelector.tscn")
 const auth_code_scene = preload("res://scenes/Login/AuthCode.tscn")
+const account_selector_scene = preload("res://scenes/Login/AccountSelector.tscn")
 
 const loading_scene = preload("res://scenes/Loading.tscn")
 const main_screen_scene = preload("res://scenes/MainScreen.tscn")
@@ -10,6 +11,7 @@ onready var networking = $Networking
 onready var scene_cont = $Panel/SceneCont
 
 var instance_address: String
+var instance: String
 var access_token: String
 var client_info: Dictionary = {
 	"auth_code": "",
@@ -30,6 +32,28 @@ func make_http_req(id: String, url: String, headers: Array, secure, method, req_
 		to_json(req_body)
 	)
 
+func connect_as_user(data: Dictionary):
+	var main_screen = main_screen_scene.instance()
+	main_screen.add_to_group("main")
+	main_screen.access_token = data.token
+	main_screen.instance_address = "https://" + data.instance + "/"
+	scene_cont.add_child(main_screen)
+
+func add_acc():
+	var users:	Array = []
+	if (Utils.f_read("users") != ""):
+		users = parse_json(Utils.f_read("users"))
+	users.push_back({
+		"token": access_token,
+		"instance": instance
+	})
+	Utils.f_write("users", to_json(users))
+
+func load_account_selector():
+	var account_selector = account_selector_scene.instance()
+	account_selector.add_to_group("account_selector")
+	scene_cont.add_child(account_selector)
+
 func load_loading_screen():
 	var loading_screen = loading_scene.instance()
 	loading_screen.add_to_group("loading_screen")
@@ -38,22 +62,19 @@ func load_loading_screen():
 func free_loading_screen():
 	get_tree().get_nodes_in_group("loading_screen")[0].queue_free()
 
-func load_main_screen():
-	var main_screen = main_screen_scene.instance()
-	main_screen.add_to_group("main")
-	main_screen.access_token = access_token
-	main_screen.instance_address = instance_address
-	scene_cont.add_child(main_screen)
-
 func _ready():
 	OS.min_window_size = get_viewport().size
-	if (Utils.f_read("token") == "" || Utils.f_read("instance_address") == ""):
+	if (Utils.f_read("users") == "" || Utils.f_read("users") == "[]"):
 		init_instance_selector()
 	else:
-		instance_address = Utils.f_read("instance_address")
-		access_token = Utils.f_read("token")
-		load_main_screen()
-	return
+		load_account_selector()
+#	if (Utils.f_read("token") == "" || Utils.f_read("instance_address") == ""):
+#		init_instance_selector()
+#	else:
+#		instance_address = Utils.f_read("instance_address")
+#		access_token = Utils.f_read("token")
+#		load_main_screen()
+#	return
 
 # INITs
 func init_instance_selector(error_text: String = ""):
@@ -67,6 +88,7 @@ func handle_instance_selector(value: String):
 	load_loading_screen()
 	print("Attempting to connect to ", value)
 	instance_address = "https://" + value + "/"
+	instance = value
 	Utils.f_write("instance_address", instance_address)
 	
 	make_http_req(
@@ -155,7 +177,10 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 	if (id == "get_access_token"):
 		var json = parse_json(body.get_string_from_utf8())
 		access_token = json.access_token
-		Utils.f_write("token", access_token)
+#		Utils.f_write("token", access_token)
 		free_loading_screen()
-		load_main_screen()
+		add_acc()
+		load_account_selector()
+#		load_main_screen()
+		
 		return

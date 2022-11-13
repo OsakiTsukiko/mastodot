@@ -48,7 +48,7 @@ func _ready():
 	var e = false
 	var i = 0
 	while (i < short_description_text.length()):
-		print(i, " ", short_description_text.length())
+#		print(i, " ", short_description_text.length())
 		if (short_description_text[i] == "<"):
 			e = true
 		if (short_description_text[i] == ">" && e):

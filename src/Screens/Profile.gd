@@ -112,5 +112,10 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 		return
 
 func _on_LogOut_pressed():
-	Utils.f_remove("token")
+	var main_screen: Node = get_tree().get_nodes_in_group("main_screen")[0]
+	if ( main_screen.has_method("log_out") ):
+			main_screen.log_out()
+
+
+func _on_SwitchAccount_pressed():
 	get_tree().reload_current_scene()

@@ -58,6 +58,17 @@ margin_right = -10.0
 margin_bottom = -10.0
 text = "Log Out"
 
+[node name="SwitchAccount" type="Button" parent="VBoxContainer/Banner"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -191.0
+margin_top = -30.0
+margin_right = -82.0
+margin_bottom = -10.0
+text = "Switch Account"
+
 [node name="Panel" type="Panel" parent="VBoxContainer"]
 margin_top = 300.0
 margin_right = 1014.0
@@ -168,3 +179,4 @@ margin_bottom = 104.0
 [node name="Networking" type="Node" parent="."]
 
 [connection signal="pressed" from="VBoxContainer/Banner/LogOut" to="." method="_on_LogOut_pressed"]
+[connection signal="pressed" from="VBoxContainer/Banner/SwitchAccount" to="." method="_on_SwitchAccount_pressed"]
