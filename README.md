@@ -5,4 +5,4 @@
 </div>
 
 # Showcase
-<img width="100%" src="https://raw.githubusercontent.com/OsakiTsukiko/mastodot/main/docs/SHOWCASE_2022_11_11_02.png">
+<img width="100%" src="https://raw.githubusercontent.com/OsakiTsukiko/mastodot/main/docs/SHOWCASE_2022_11_13_01.png">
