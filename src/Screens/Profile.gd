@@ -94,11 +94,11 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 	if (id == "avatar"):
 		var image = Image.new()
 		var image_error 
-		if ("png" in data.avatar_static):
+		if (data.avatar_static.get_extension() == "png"):
 			image_error = image.load_png_from_buffer(body)
-		elif ("jpg" in data.avatar_static):
+		elif (data.avatar_static.get_extension() == "jpg"):
 			image_error = image.load_jpg_from_buffer(body)
-		elif ("webp" in data.avatar_static):
+		elif (data.avatar_static.get_extension() == "webp"):
 			image_error = image.load_webp_from_buffer(body)
 		else:
 			return

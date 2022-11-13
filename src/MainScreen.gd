@@ -2,6 +2,7 @@ extends MarginContainer
 
 const profile_scene = preload("res://scenes/Screens/Profile.tscn")
 const instance_scene = preload("res://scenes/Screens/Instance.tscn")
+const local_scene = preload("res://scenes/Screens/Local.tscn")
 
 const loading_scene = preload("res://scenes/Loading.tscn")
 
@@ -9,6 +10,7 @@ onready var networking = $Networking
 
 onready var profile_tab = $TabContainer/Profile
 onready var instance_tab = $TabContainer/Instance
+onready var local_tab = $TabContainer/Local
 
 var access_token: String
 var instance_address: String
@@ -58,6 +60,11 @@ func _ready():
 		{}
 	)
 	
+	var local_screen = local_scene.instance()
+	local_screen.add_to_group("local_screen")
+	local_screen.access_token = access_token
+	local_screen.instance_address = instance_address
+	local_tab.add_child(local_screen)
 	return
 
 func http_req_handler(result, response_code, headers, body, req_node, id):
@@ -70,6 +77,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 			if (child.is_in_group("loading")):
 				child.queue_free()
 		var profile = profile_scene.instance()
+		profile.add_to_group("profile_screen")
 		profile.data = json
 		profile.instance_address = instance_address
 		profile_tab.add_child(profile)
@@ -79,6 +87,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 		if (Config.debug_mode): 
 			Utils.f_write("instance_info_debug", body.get_string_from_utf8())
 		var instance_screen = instance_scene.instance()
+		instance_screen.add_to_group("instance_scene")
 		instance_screen.data = json
 		instance_screen.instance_address = instance_address
 		instance_tab.add_child(instance_screen)

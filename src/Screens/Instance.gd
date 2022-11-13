@@ -38,29 +38,15 @@ func _ready():
 	user_count.text = "\n" + String(data.stats.user_count) + "\n"
 	status_count.text = "\n" + String(data.stats.status_count) + "\n"
 	domain_count.text = "\n" + String(data.stats.domain_count) + "\n"
-	var short_description_text: String = data.description
 	
 #	BIGH UGH
 #	WHY MUST THEY USE HTML IN APIs...
 #	OFC INSTANCE ADMINS ARE GONNA USE HTML IF EVEN
 #	THE MAIN DEVS OF MASTODON ARE (MASTODON.SOCIAL - used
 #	as example in the api docs... -_-)
-	var e = false
-	var i = 0
-	while (i < short_description_text.length()):
-#		print(i, " ", short_description_text.length())
-		if (short_description_text[i] == "<"):
-			e = true
-		if (short_description_text[i] == ">" && e):
-			short_description_text.erase(i, 1)
-			i -= 1
-			e = false
-		if (e):
-			short_description_text.erase(i, 1)
-			i -= 1
-		i += 1
-#		FOR LOOPS ARE DUMB
-	short_description.text = "\n" + short_description_text + "\n"
+
+#	Moved it to Utils.. made a static func out of it... kinda bad tho
+	short_description.text = "\n" + Utils.bad_html_parse(data.description) + "\n"
 	
 	email.text = "\nEmail: " + data.email + "\n"
 	owner_acc.text = "\nOwner: " + data.contact_account.username + "\n" + data.contact_account.url + "\n"
