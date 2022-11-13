@@ -5,11 +5,11 @@ onready var user_cont = $HBoxContainer/PanelContainer/MarginContainer/VBoxContai
 
 var users: Array = []
 
-func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary, data: Dictionary = {}):
+func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary, data: Dictionary = {}, data_node: Node = Node.new()):
 	var http_req_node: HTTPRequest = HTTPRequest.new()
 	http_req_node.use_threads = true
 	networking.add_child(http_req_node)
-	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id, data])
+	http_req_node.connect("request_completed", self, "http_req_handler", [http_req_node, id, data, data_node])
 	http_req_node.request(
 		url, 
 		headers, 
@@ -40,7 +40,7 @@ func _ready():
 		)
 	pass
 
-func http_req_handler(result, response_code, headers, body, req_node: Node, id: String, data: Dictionary):
+func http_req_handler(result, response_code, headers, body, req_node: Node, id: String, data: Dictionary, data_node: Node):
 	req_node.queue_free()
 	if (id == "verify_credentials"):
 		var json = parse_json(body.get_string_from_utf8())
@@ -53,6 +53,38 @@ func http_req_handler(result, response_code, headers, body, req_node: Node, id: 
 		user_button.clip_text = true
 		user_cont.add_child(user_button)
 		user_button.connect("pressed", self, "connect_as_user", [data])
+		make_http_req(
+			"button_avatar",
+			json.avatar_static,
+			[],
+			true,
+			HTTPClient.METHOD_GET,
+			{},
+			{
+				"url": json.avatar_static
+			},
+			user_button
+		)
+		return
+	if (id == "button_avatar"):
+		var image = Image.new()
+		var image_error 
+		if (data.url.get_extension() == "png"):
+			image_error = image.load_png_from_buffer(body)
+		elif (data.url.get_extension() == "jpg"):
+			image_error = image.load_jpg_from_buffer(body)
+		elif (data.url.get_extension() == "webp"):
+			image_error = image.load_webp_from_buffer(body)
+		else:
+			return
+		
+		if image_error != OK:
+			print("An error occurred while trying to display the image.")
+			return
+		var texture = ImageTexture.new()
+		texture.create_from_image(image)
+		data_node.expand_icon = true
+		data_node.icon = texture
 		return
 
 
