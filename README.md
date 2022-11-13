@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Mastodot</h1>
-  <h3>A Mastodon client build in Godot just for FUN!</h3>
-  (And to challenge the limits of Godot)
+  <h3>A Mastodon client built in Godot!</h3>
+  (for fun and to challenge the limits of Godot)
 </div>
 
 # Showcase
