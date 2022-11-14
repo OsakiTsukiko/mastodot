@@ -36,12 +36,19 @@ script = ExtResource( 2 )
 
 [node name="Username" type="Label" parent="VBoxContainer/HBoxContainer"]
 margin_left = 34.0
-margin_right = 1010.0
+margin_right = 1006.0
 margin_bottom = 30.0
 size_flags_horizontal = 3
 size_flags_vertical = 5
 valign = 1
 autowrap = true
+
+[node name="Timestamp" type="Label" parent="VBoxContainer/HBoxContainer"]
+margin_left = 1010.0
+margin_right = 1010.0
+margin_bottom = 30.0
+size_flags_vertical = 5
+align = 2
 
 [node name="Text" type="Label" parent="VBoxContainer"]
 margin_top = 40.0

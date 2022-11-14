@@ -41,6 +41,19 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 			var status_node = status_scene.instance()
 			status_node.username = status.account.display_name + "\n@" + status.account.acct
 			status_node.content = Utils.bad_html_parse(status.content)
+			var time_dict = Time.get_datetime_dict_from_datetime_string(status.created_at, false)
+			var local_time_info = OS.get_time_zone_info()
+#			I've seen somewhere that this is broken on win ^
+#			Might have to look into it
+			time_dict.hour += local_time_info.bias / 60
+			time_dict.day += time_dict.hour / 24
+			time_dict.hour = time_dict.hour % 24
+			time_dict.minute += local_time_info.bias % 60
+#			I'm not even sure this works tbh :skull:
+#			Just made it up rn :
+			
+			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) # + " " + String(time_dict.day) + "/" + String(time_dict.month) + "/" + String(time_dict.year) 
+			
 			status_cont.add_child(status_node)
 			make_http_req(
 				"avatar",
