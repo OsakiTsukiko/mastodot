@@ -73,6 +73,8 @@ func http_req_handler(result, response_code, headers, body, req_node: Node, id: 
 			image_error = image.load_png_from_buffer(body)
 		elif (data.url.get_extension() == "jpg"):
 			image_error = image.load_jpg_from_buffer(body)
+		elif (data.url.get_extension() == "jpeg"):
+			image_error = image.load_jpg_from_buffer(body)
 		elif (data.url.get_extension() == "webp"):
 			image_error = image.load_webp_from_buffer(body)
 		else:
