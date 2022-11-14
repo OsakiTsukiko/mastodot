@@ -8,6 +8,8 @@ onready var status_cont = $VBoxContainer/Feed/MarginContainer/ScrollContainer/St
 var access_token: String
 var instance_address: String
 
+var feed: Array = []
+
 func make_http_req(id: String, url: String, headers: Array, secure, method, req_body: Dictionary, data: Dictionary = {}, node_data: Node = Node.new()):
 	var http_req_node: HTTPRequest = HTTPRequest.new()
 	http_req_node.use_threads = true
@@ -35,12 +37,23 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 	req_node.queue_free()
 	if (id == "get_local_feed"):
 		var json = parse_json(body.get_string_from_utf8())
-		if (Config.debug_mode):
-			Utils.f_write("debug_local_feed", to_json(json))
-		for status in json:
+#		if (Config.debug_mode):
+#			Utils.f_write("debug_local_feed", to_json(json))
+#		for status in json:
+#		GOD I HATE FOR LOOPS IN GODOT... WHY CANT THEY BE LIKE CPP ONES?!
+		var i = json.size() - 1
+		while (i >= 0):
+			var status = json[i]
+			if (feed.has(status.id)):
+#				Should I loop through nodes and look for the seed value?
+#				A separate array seems faster, but more... yaiks
+				i -= 1
+				continue
+			feed.push_front(status.id)
 			var status_node = status_scene.instance()
 			status_node.username = status.account.display_name + "\n@" + status.account.acct
 			status_node.content = Utils.bad_html_parse(status.content)
+			status_node.sid = status.id
 			var time_dict = Time.get_datetime_dict_from_datetime_string(status.created_at, false)
 			var local_time_info = OS.get_time_zone_info()
 #			I've seen somewhere that this is broken on win ^
@@ -55,6 +68,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) # + " " + String(time_dict.day) + "/" + String(time_dict.month) + "/" + String(time_dict.year) 
 			
 			status_cont.add_child(status_node)
+			status_cont.move_child(status_node, 0)
 			make_http_req(
 				"avatar",
 				status.account.avatar_static,
@@ -65,6 +79,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 				{"url": status.account.avatar_static},
 				status_node
 			)
+			i -= 1
 		return
 	
 	if (id == "avatar"):
@@ -73,6 +88,8 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 		if (data.url.get_extension() == "png"):
 			image_error = image.load_png_from_buffer(body)
 		elif (data.url.get_extension() == "jpg"):
+			image_error = image.load_jpg_from_buffer(body)
+		elif (data.url.get_extension() == "jpeg"):
 			image_error = image.load_jpg_from_buffer(body)
 		elif (data.url.get_extension() == "webp"):
 			image_error = image.load_webp_from_buffer(body)
@@ -86,3 +103,30 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 		texture.create_from_image(image)
 		node_data.load_avatar(texture)
 		return
+
+
+func autoreload():
+	make_http_req(
+		"get_local_feed",
+		instance_address + "api/v1/timelines/public?local=true&limit=40",
+		["Authorization: Bearer " + access_token],
+		true,
+		HTTPClient.METHOD_GET,
+		{}
+	)
+	pass
+
+
+func _on_Refresh_button_pressed():
+	feed.clear()
+	for child in status_cont.get_children():
+		child.queue_free()
+	make_http_req(
+		"get_local_feed",
+		instance_address + "api/v1/timelines/public?local=true&limit=40",
+		["Authorization: Bearer " + access_token],
+		true,
+		HTTPClient.METHOD_GET,
+		{}
+	)
+	pass

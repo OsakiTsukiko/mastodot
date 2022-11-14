@@ -8,6 +8,7 @@ onready var timestamp_node = $VBoxContainer/HBoxContainer/Timestamp
 var username: String
 var content: String
 var timestamp: String
+var sid: String
 
 func load_avatar(texture: ImageTexture):
 	avatar_node.texture = texture
