@@ -65,7 +65,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 #			I'm not even sure this works tbh :skull:
 #			Just made it up rn :
 			
-			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) + " " + String(time_dict.day).pad_zeros(2) + "." + String(time_dict.month).pad_zeros(2) + "." + String(time_dict.year).pad_zeros(2) 
+			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) + " " + String(time_dict.day).pad_zeros(2) + "." + String(time_dict.month).pad_zeros(2) + "." + String(time_dict.year)
 			
 			status_cont.add_child(status_node)
 			status_cont.move_child(status_node, 0)
