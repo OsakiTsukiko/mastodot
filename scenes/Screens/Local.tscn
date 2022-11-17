@@ -95,6 +95,6 @@ autostart = true
 wait_time = 5.0
 one_shot = true
 
-[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Update_button" to="." method="_on_Update_pressed"]
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Update_button" to="." method="_on_Update_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Refresh_button" to="." method="_on_Refresh_button_pressed"]
 [connection signal="timeout" from="AutoReload" to="." method="autoreload"]
