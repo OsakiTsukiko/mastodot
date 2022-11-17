@@ -28,9 +28,3 @@ jobs:
           name: mastodot_${{ matrix.platform }}
           preset: ${{ matrix.platform }}
           debugMode: "true"
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: mastodot_${{ matrix.platform }}
-          path: ${{ github.workspace }}/${{ steps.build.outputs.build }}
