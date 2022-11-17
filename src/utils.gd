@@ -35,3 +35,9 @@ static func bad_html_parse(text: String) -> String:
 	text = text.replacen("&#39;", "'")
 	return text
 #		FOR LOOPS ARE DUMB
+
+static func custom_has_object_array (array: Array, key: String, value) -> bool:
+	for i in array:
+		if (i[key] == value): 
+			return true
+	return false
