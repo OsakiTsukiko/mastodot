@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [linux, windows, mac]
+        platform: [linux, windows]
         
     steps:
       - uses: actions/checkout@v2
