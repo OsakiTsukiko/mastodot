@@ -39,34 +39,30 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 		var json = parse_json(body.get_string_from_utf8())
 #		if (Config.debug_mode):
 #			Utils.f_write("debug_local_feed", to_json(json))
-#		for status in json:
-
 		for i in range(json.size() - 1, -1, -1):
 			var status = json[i]
-			if (feed.has(status.id)):
-#				Should I loop through nodes and look for the seed value?
-#				A separate array seems faster, but more... yaiks
+			if (Utils.custom_has_object_array(feed, "id", status.id)):
 				continue
-			feed.push_front(status.id)
 			var status_node = status_scene.instance()
 			status_node.username = status.account.display_name + "\n@" + status.account.acct
 			status_node.content = Utils.bad_html_parse(status.content)
 			status_node.sid = status.id
 			var time_dict = Time.get_datetime_dict_from_datetime_string(status.created_at, false)
 			var local_time_info = OS.get_time_zone_info()
-#			I've seen somewhere that this is broken on win ^
-#			Might have to look into it
+#			OsakiTsukiko:	I've seen somewhere that this is broken on win ^
+#							Might have to look into it
+#			HoriuchiAkira: Seems to work fine
+
 			time_dict.hour += local_time_info.bias / 60
 			time_dict.day += time_dict.hour / 24
 			time_dict.hour = time_dict.hour % 24
 			time_dict.minute += local_time_info.bias % 60
 #			I'm not even sure this works tbh :skull:
 #			Just made it up rn :
-			
 			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) + " " + String(time_dict.day).pad_zeros(2) + "." + String(time_dict.month).pad_zeros(2) + "." + String(time_dict.year)
-			
 			status_cont.add_child(status_node)
 			status_cont.move_child(status_node, 0)
+			feed.push_front({"id": status.id, "node": status_node})
 			make_http_req(
 				"avatar",
 				status.account.avatar_static,
