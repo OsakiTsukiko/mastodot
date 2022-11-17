@@ -40,14 +40,12 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 #		if (Config.debug_mode):
 #			Utils.f_write("debug_local_feed", to_json(json))
 #		for status in json:
-#		GOD I HATE FOR LOOPS IN GODOT... WHY CANT THEY BE LIKE CPP ONES?!
-		var i = json.size() - 1
-		while (i >= 0):
+
+		for i in range(json.size() - 1, -1, -1):
 			var status = json[i]
 			if (feed.has(status.id)):
 #				Should I loop through nodes and look for the seed value?
 #				A separate array seems faster, but more... yaiks
-				i -= 1
 				continue
 			feed.push_front(status.id)
 			var status_node = status_scene.instance()
@@ -79,7 +77,6 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 				{"url": status.account.avatar_static},
 				status_node
 			)
-			i -= 1
 		return
 	
 	if (id == "avatar"):
