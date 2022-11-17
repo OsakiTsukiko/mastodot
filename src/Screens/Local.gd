@@ -4,6 +4,8 @@ const status_scene = preload("res://scenes/Screens/Local/Status.tscn")
 
 onready var networking = $Networking
 onready var status_cont = $VBoxContainer/Feed/MarginContainer/ScrollContainer/StatusCont
+onready var scroll_cont = $VBoxContainer/Feed/MarginContainer/ScrollContainer
+onready var scroll_timer = $ScrollTimer
 
 var access_token: String
 var instance_address: String
@@ -39,8 +41,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 		var json = parse_json(body.get_string_from_utf8())
 #		if (Config.debug_mode):
 #			Utils.f_write("debug_local_feed", to_json(json))
-		for i in range(json.size() - 1, -1, -1):
-			var status = json[i]
+		for status in json:
 			if (Utils.custom_has_object_array(feed, "id", status.id)):
 				continue
 			var status_node = status_scene.instance()
@@ -49,20 +50,28 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 			status_node.sid = status.id
 			var time_dict = Time.get_datetime_dict_from_datetime_string(status.created_at, false)
 			var local_time_info = OS.get_time_zone_info()
-#			OsakiTsukiko:	I've seen somewhere that this is broken on win ^
-#							Might have to look into it
-#			HoriuchiAkira: Seems to work fine
 
 			time_dict.hour += local_time_info.bias / 60
 			time_dict.day += time_dict.hour / 24
 			time_dict.hour = time_dict.hour % 24
 			time_dict.minute += local_time_info.bias % 60
-#			I'm not even sure this works tbh :skull:
-#			Just made it up rn :
+			
 			status_node.timestamp += String(time_dict.hour).pad_zeros(2) + ":" + String(time_dict.minute).pad_zeros(2) + " " + String(time_dict.day).pad_zeros(2) + "." + String(time_dict.month).pad_zeros(2) + "." + String(time_dict.year)
-			status_cont.add_child(status_node)
-			status_cont.move_child(status_node, 0)
-			feed.push_front({"id": status.id, "node": status_node})
+			
+			var element = {"id": status.id, "node": status_node, "timestamp": Time.get_unix_time_from_datetime_string(status.created_at)}
+			var inserted: bool = false
+			for j in range(0, feed.size()):
+				if (element.timestamp > feed[j].timestamp):
+					feed.insert(j, element)
+					status_cont.add_child(status_node)
+					status_cont.move_child(status_node, j)
+					inserted = true
+					break
+			if (!inserted):
+				feed.push_back(element)
+				status_cont.add_child(status_node)
+				status_cont.move_child(status_node, feed.size())
+			
 			make_http_req(
 				"avatar",
 				status.account.avatar_static,
@@ -73,6 +82,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 				{"url": status.account.avatar_static},
 				status_node
 			)
+			
 		return
 	
 	if (id == "avatar"):
@@ -107,19 +117,40 @@ func autoreload():
 		HTTPClient.METHOD_GET,
 		{}
 	)
-	pass
 
-
-func _on_Refresh_button_pressed():
-	feed.clear()
-	for child in status_cont.get_children():
-		child.queue_free()
+func reload_feed_req():
+	var url: String = instance_address + "api/v1/timelines/public?local=true&limit=40"
+	if (feed.size() > 0):
+		url += "&min_id=" + feed[0].id
 	make_http_req(
 		"get_local_feed",
-		instance_address + "api/v1/timelines/public?local=true&limit=40",
+		url,
 		["Authorization: Bearer " + access_token],
 		true,
 		HTTPClient.METHOD_GET,
 		{}
 	)
-	pass
+
+func _on_Refresh_button_pressed():
+	feed.clear()
+	for child in status_cont.get_children():
+		child.queue_free()
+	reload_feed_req()
+
+
+func _on_Update_button_pressed():
+	reload_feed_req()
+
+func _process(delta):
+	var scroll_bar = scroll_cont.get_v_scrollbar()
+	if (((scroll_bar.max_value - scroll_bar.rect_size.y) - scroll_bar.value) <= 0 && scroll_timer.time_left == 0 && feed.size() != 0):
+		scroll_timer.start()
+		var url: String = instance_address + "api/v1/timelines/public?local=true&limit=40&max_id=" + feed[feed.size() - 1].id
+		make_http_req(
+			"get_local_feed",
+			url,
+			["Authorization: Bearer " + access_token],
+			true,
+			HTTPClient.METHOD_GET,
+			{}
+		)

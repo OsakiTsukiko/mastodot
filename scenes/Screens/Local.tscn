@@ -31,16 +31,22 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_constants/separation = 5
 
 [node name="Temp" type="Label" parent="VBoxContainer/Panel/HBoxContainer"]
-margin_right = 941.0
+margin_right = 872.0
 margin_bottom = 52.0
 size_flags_horizontal = 3
 size_flags_vertical = 7
 text = "TODO: Filters"
 align = 1
 valign = 1
+
+[node name="Update_button" type="Button" parent="VBoxContainer/Panel/HBoxContainer"]
+margin_left = 876.0
+margin_right = 942.0
+margin_bottom = 52.0
+size_flags_vertical = 3
+text = " Update "
 
 [node name="Refresh_button" type="Button" parent="VBoxContainer/Panel/HBoxContainer"]
 margin_left = 946.0
@@ -82,8 +88,13 @@ size_flags_vertical = 3
 [node name="Networking" type="Node" parent="."]
 
 [node name="AutoReload" type="Timer" parent="."]
-wait_time = 60.0
+wait_time = 30.0
 autostart = true
 
+[node name="ScrollTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Update_button" to="." method="_on_Update_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Refresh_button" to="." method="_on_Refresh_button_pressed"]
 [connection signal="timeout" from="AutoReload" to="." method="autoreload"]
