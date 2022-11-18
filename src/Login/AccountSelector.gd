@@ -24,7 +24,8 @@ func _ready():
 		var u = parse_json(users_json)
 		users = u
 	
-	for user in users:
+	for i in range(0, users.size()):
+		var user = users[i]
 		if (!user.has("token") || !user.has("instance")):
 			users.erase(user)
 			Utils.f_write("users", to_json(users))
@@ -36,7 +37,10 @@ func _ready():
 			true,
 			HTTPClient.METHOD_GET,
 			{},
-			user
+			{
+				"user": user,
+				"index": i
+			}
 		)
 	pass
 
@@ -45,14 +49,15 @@ func http_req_handler(result, response_code, headers, body, req_node: Node, id: 
 	if (id == "verify_credentials"):
 		var json = parse_json(body.get_string_from_utf8())
 		if (json.has("error")):
-			users.erase(data)
+			users.erase(data.user)
 			Utils.f_write("users", to_json(users))
 			return
 		var user_button = Button.new()
-		user_button.text = "@" + json.username + "@" + data.instance
+		user_button.text = "@" + json.username + "@" + data.user.instance
 		user_button.clip_text = true
 		user_cont.add_child(user_button)
-		user_button.connect("pressed", self, "connect_as_user", [data])
+		user_cont.move_child(user_button, data.index)
+		user_button.connect("pressed", self, "connect_as_user", [data.user])
 		make_http_req(
 			"button_avatar",
 			json.avatar_static,
