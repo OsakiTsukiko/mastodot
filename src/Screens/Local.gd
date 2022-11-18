@@ -6,6 +6,7 @@ onready var networking = $Networking
 onready var status_cont = $VBoxContainer/Feed/MarginContainer/ScrollContainer/StatusCont
 onready var scroll_cont = $VBoxContainer/Feed/MarginContainer/ScrollContainer
 onready var scroll_timer = $ScrollTimer
+onready var reload_timer = $AutoReload
 
 var access_token: String
 var instance_address: String
@@ -82,7 +83,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id, data, 
 				{"url": status.account.avatar_static},
 				status_node
 			)
-			
+		GlobalDebug.local.loaded_statuses = feed.size()
 		return
 	
 	if (id == "avatar"):
@@ -154,3 +155,4 @@ func _process(delta):
 			HTTPClient.METHOD_GET,
 			{}
 		)
+	GlobalDebug.local.time_until_reload = reload_timer.time_left

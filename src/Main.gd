@@ -9,6 +9,7 @@ const main_screen_scene = preload("res://scenes/MainScreen.tscn")
 
 onready var networking = $Networking
 onready var scene_cont = $Panel/SceneCont
+onready var debug_screen = $DebugScreen
 
 var instance_address: String
 var instance: String
@@ -184,3 +185,7 @@ func http_req_handler(result, response_code, headers, body, req_node, id):
 #		load_main_screen()
 		
 		return
+
+func _process(delta):
+	if Input.is_action_just_pressed("debug_key"):
+		debug_screen.visible = !debug_screen.visible
