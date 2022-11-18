@@ -56,6 +56,13 @@ func http_req_handler(result, response_code, headers, body, req_node: Node, id: 
 		user_button.text = "@" + json.username + "@" + data.user.instance
 		user_button.clip_text = true
 		user_cont.add_child(user_button)
+#		var index: int
+#		if (user_cont.get_child_count() < data.index):
+#			index = user_cont.get_child_count()
+#		else:
+#			index = data.index
+
+#		UGH :{
 		user_cont.move_child(user_button, data.index)
 		user_button.connect("pressed", self, "connect_as_user", [data.user])
 		make_http_req(
